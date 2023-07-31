@@ -14,9 +14,12 @@ use blog_os::println;
 pub extern "C" fn _start() -> ! {
     println!("'ullo governer");
 
+    blog_os::init();
+
     #[cfg(test)]
     test_main();
 
+    println!("Blimey! It didn't crash!");
     loop {}
 }
 
