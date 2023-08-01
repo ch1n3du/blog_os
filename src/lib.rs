@@ -17,6 +17,8 @@ use core::panic::PanicInfo;
 pub fn init() {
     gdt::init();
     interrupts::init_idt();
+    unsafe { interrupts::PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
 }
 
 pub trait Testable {
@@ -47,7 +49,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    hlt_loop();
 }
 
 #[cfg(test)]
@@ -79,5 +81,12 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
         // Make a port for the isa-debug-exit device.
         let mut port = Port::new(0xf4);
         port.write(exit_code as u32);
+    }
+}
+
+/// Sleeps the CPU to avoid wasting resources
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
     }
 }

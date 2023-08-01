@@ -7,7 +7,7 @@
 
 use core::panic::PanicInfo;
 
-use blog_os::println;
+use blog_os::{print, println};
 
 // Entry point for the program
 #[no_mangle]
@@ -20,7 +20,13 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("Blimey! It didn't crash!");
-    loop {}
+    // loop {
+    //     for _ in 0..10000 {
+    //         volatile::Volatile::new(0).read();
+    //     }
+    //     print!("-");
+    // }
+    blog_os::hlt_loop();
 }
 
 // Called on a panic.
@@ -28,7 +34,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    blog_os::hlt_loop();
 }
 
 #[cfg(test)]
